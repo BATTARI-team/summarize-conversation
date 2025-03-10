@@ -9,6 +9,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace HelloGcs;
 
@@ -36,15 +37,11 @@ public class Function : ICloudEventFunction<StorageObjectData>
         {
             Console.WriteLine("MP4 file detected. Summarizing conversation...");
             HttpClient client = new HttpClient();
-            using StringContent jsonContent = new(
-                JsonSerializer.Serialize(new
-                {
-                    fileName = data.Name
-                }),
-                Encoding.UTF8,
-                "application/json");
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, $"https://summarize-conversation.takutk.shop/Home/StartSummarize"); //Replace "YOUR_ENDPOINT_HERE"
-            request.Content = jsonContent;
+            var content = new FormUrlEncodedContent(new[] {
+        new KeyValuePair<string, string>("fileName", data.Name),
+      });
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, $"https://summarize-conversation.takutk.shop/Home/StartSummarize"); // Replace "YOUR_ENDPOINT_HERE"
+            request.Content = content;
             HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
@@ -54,7 +51,6 @@ public class Function : ICloudEventFunction<StorageObjectData>
             {
                 Console.WriteLine("Conversion failed.");
             }
-
         }
     }
 }
