@@ -16,6 +16,7 @@ public class Function : ICloudEventFunction<StorageObjectData>
 {
     public async Task HandleAsync(CloudEvent cloudEvent, StorageObjectData data, CancellationToken cancellationToken)
     {
+        Environment.SetEnvironmentVariable("DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP3SUPPORT", "false");
         Console.WriteLine("Storage object information:");
         Console.WriteLine($"  Name: {data.Name}");
         Console.WriteLine($"  Bucket: {data.Bucket}");
